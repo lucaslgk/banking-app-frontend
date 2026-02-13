@@ -95,12 +95,17 @@ def fraud() -> rx.Component:
                 ),
             ),
 
-            # Loading spinner
+            # Loading indicator
             rx.cond(
                 AppState.is_loading,
-                rx.center(
-                    rx.spinner(size="3"),
-                    padding="2em",
+                rx.vstack(
+                    rx.text("Analyse des données de fraude...", color="gray.500", font_size="1.1em"),
+                    rx.progress(is_indeterminate=True, width="50%", color_scheme="red", height="12px", border_radius="6px"),
+                    align_items="center",
+                    justify="center",
+                    padding_y="4em",
+                    width="100%",
+                    spacing="4",
                 ),
             ),
 
