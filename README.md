@@ -62,7 +62,7 @@ Module spécialisé pour les analystes de sécurité :
 
 ### Prérequis
 - Python 3.8 ou supérieur
-- Un accès au backend de l'API (local ou distant)
+- Un accès au backend de l'API (local ou distant) accessible via ce projet https://github.com/lucaslgk/projet_python_2_mba
 
 ### Étapes d'installation
 
