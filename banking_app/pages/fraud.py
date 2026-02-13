@@ -8,26 +8,68 @@ from ..state.app_state import AppState
 
 class FraudState(rx.State):
     """State for fraud prediction form."""
-    
+
     pred_amount: str = ""
     pred_use_chip: str = "Swipe Transaction"
     pred_merchant_state: str = ""
     pred_mcc: str = ""
-    
+
+    def set_pred_amount(self, value: str):
+        """Set prediction amount."""
+        self.pred_amount = value
+
+    def set_pred_use_chip(self, value: str):
+        """Set prediction transaction type."""
+        self.pred_use_chip = value
+
+    def set_pred_merchant_state(self, value: str):
+        """Set prediction merchant state."""
+        self.pred_merchant_state = value
+
+    def set_pred_mcc(self, value: str):
+        """Set prediction MCC."""
+        self.pred_mcc = value
+
+    def clear_form(self):
+        """Clear all form fields."""
+        self.pred_amount = ""
+        self.pred_use_chip = "Swipe Transaction"
+        self.pred_merchant_state = ""
+        self.pred_mcc = ""
+
     async def submit_prediction(self):
-        """Submit fraud prediction."""
+        """Submit fraud prediction with proper async handling."""
+        # Validate inputs
+        if not self.pred_amount:
+            app_state = await self.get_state(AppState)
+            app_state.error_message = "Please enter an amount"
+            return
+
+        if not self.pred_mcc:
+            app_state = await self.get_state(AppState)
+            app_state.error_message = "Please enter a MCC code"
+            return
+
+        if not self.pred_merchant_state:
+            app_state = await self.get_state(AppState)
+            app_state.error_message = "Please enter a merchant state"
+            return
+
         try:
             amount = float(self.pred_amount)
             mcc = int(self.pred_mcc)
-            
-            return AppState.predict_fraud(
+
+            # Get AppState and call predict_fraud
+            app_state = await self.get_state(AppState)
+            await app_state.predict_fraud(
                 amount=amount,
                 use_chip=self.pred_use_chip,
                 merchant_state=self.pred_merchant_state,
                 mcc=mcc,
             )
-        except ValueError as e:
-            AppState.error_message = f"Invalid input: {str(e)}"
+        except ValueError:
+            app_state = await self.get_state(AppState)
+            app_state.error_message = "Invalid input: Amount must be a number and MCC must be an integer"
 
 
 def fraud() -> rx.Component:
@@ -41,7 +83,7 @@ def fraud() -> rx.Component:
                 color="gray.600",
                 margin_bottom="2em",
             ),
-            
+
             # Error message
             rx.cond(
                 AppState.error_message != "",
@@ -52,7 +94,7 @@ def fraud() -> rx.Component:
                     margin_bottom="1em",
                 ),
             ),
-            
+
             # Loading spinner
             rx.cond(
                 AppState.is_loading,
@@ -61,7 +103,7 @@ def fraud() -> rx.Component:
                     padding="2em",
                 ),
             ),
-            
+
             # Fraud summary stats
             rx.cond(
                 ~AppState.is_loading & (AppState.fraud_summary != {}),
@@ -81,9 +123,9 @@ def fraud() -> rx.Component:
                             "orange",
                         ),
                         stat_card(
-                            "Suspect Transactions",
-                            AppState.fraud_summary.get("flagged", 0).to(str),
-                            "flag",
+                            "Total Fraud Amount",
+                            f"${AppState.fraud_summary.get('total_fraud_amount', 0).to(float):,.2f}",
+                            "dollar-sign",
                             "purple",
                         ),
                         columns="3",
@@ -94,7 +136,7 @@ def fraud() -> rx.Component:
                     margin_bottom="2em",
                 ),
             ),
-            
+
             # Fraud by type
             rx.cond(
                 ~AppState.is_loading & (AppState.fraud_by_type.length() > 0),
@@ -154,7 +196,7 @@ def fraud() -> rx.Component:
                     margin_bottom="2em",
                 ),
             ),
-            
+
             # Fraud prediction form
             rx.vstack(
                 rx.heading("Fraud Prediction", size="6", margin_bottom="1em"),
@@ -165,7 +207,7 @@ def fraud() -> rx.Component:
                             color="gray.600",
                             margin_bottom="1em",
                         ),
-                        
+
                         rx.grid(
                             rx.vstack(
                                 rx.text("Amount", font_weight="bold", font_size="0.9em"),
@@ -190,8 +232,9 @@ def fraud() -> rx.Component:
                             ),
                             rx.vstack(
                                 rx.text("Merchant State", font_weight="bold", font_size="0.9em"),
-                                rx.input(
-                                    placeholder="CA",
+                                rx.select(
+                                    AppState.merchant_states,
+                                    placeholder="Select State",
                                     value=FraudState.pred_merchant_state,
                                     on_change=FraudState.set_pred_merchant_state,
                                 ),
@@ -200,9 +243,9 @@ def fraud() -> rx.Component:
                             ),
                             rx.vstack(
                                 rx.text("MCC (Merchant Category Code)", font_weight="bold", font_size="0.9em"),
-                                rx.input(
-                                    placeholder="5812",
-                                    type="number",
+                                rx.select(
+                                    AppState.mcc_codes,
+                                    placeholder="Select MCC",
                                     value=FraudState.pred_mcc,
                                     on_change=FraudState.set_pred_mcc,
                                 ),
@@ -213,19 +256,28 @@ def fraud() -> rx.Component:
                             spacing="4",
                             width="100%",
                         ),
-                        
-                        rx.button(
-                            rx.cond(
-                                AppState.is_loading,
-                                rx.spinner(size="1", color="white"),
-                                rx.text("Analyze Transaction"),
+
+                        rx.hstack(
+                            rx.button(
+                                rx.cond(
+                                    AppState.is_loading,
+                                    rx.spinner(size="1", color="white"),
+                                    rx.text("Analyze Transaction"),
+                                ),
+                                on_click=FraudState.submit_prediction,
+                                color_scheme="purple",
+                                size="3",
+                                width="200px",
                             ),
-                            on_click=FraudState.submit_prediction,
-                            color_scheme="purple",
-                            size="3",
-                            width="200px",
+                            rx.button(
+                                "Clear",
+                                on_click=FraudState.clear_form,
+                                variant="outline",
+                                size="3",
+                            ),
+                            spacing="3",
                         ),
-                        
+
                         # Prediction result
                         rx.cond(
                             AppState.fraud_prediction != {},
@@ -276,7 +328,7 @@ def fraud() -> rx.Component:
                                 margin_top="1em",
                             ),
                         ),
-                        
+
                         spacing="4",
                     ),
                     padding="1.5em",
@@ -288,7 +340,7 @@ def fraud() -> rx.Component:
                 ),
                 width="100%",
             ),
-            
+
             width="100%",
             spacing="4",
         ),

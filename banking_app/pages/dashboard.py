@@ -170,7 +170,7 @@ def dashboard() -> rx.Component:
                             rx.vstack(
                                 rx.text("Total Endpoints", font_weight="bold", color="gray.700"),
                                 rx.text(
-                                    "20",  # Hardcoded based on API structure (8 txn + 3 cust + 4 stats + 3 fraud + 2 sys)
+                                    "20",
                                     font_size="1.2em",
                                     color="gray.800",
                                 ),
