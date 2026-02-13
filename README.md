@@ -1,5 +1,4 @@
 # Banking App Frontend
-[![CI/CD Pipeline](https://github.com/lucaslgk/projet_python_2_mba/actions/workflows/ci.yml/badge.svg)](https://github.com/lucaslgk/projet_python_2_mba/actions/workflows/ci.yml)
 
 ![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=flat&logo=python&logoColor=white)
 ![Pandas](https://img.shields.io/badge/Pandas-2.1.4-150458?style=flat&logo=pandas&logoColor=white)
