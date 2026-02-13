@@ -1,9 +1,10 @@
 # Banking App Frontend
+[![CI/CD Pipeline](https://github.com/lucaslgk/projet_python_2_mba/actions/workflows/ci.yml/badge.svg)](https://github.com/lucaslgk/projet_python_2_mba/actions/workflows/ci.yml)
 
-![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python&logoColor=white)
-![Reflex](https://img.shields.io/badge/Reflex-0.6.0%2B-black?style=for-the-badge&logo=reflex&logoColor=white)
-![Pandas](https://img.shields.io/badge/Pandas-Data%20Analysis-150458?style=for-the-badge&logo=pandas&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Development-yellow?style=for-the-badge)
+![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=flat&logo=python&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-2.1.4-150458?style=flat&logo=pandas&logoColor=white)
+![Reflex](https://img.shields.io/badge/Reflex-0.6.0%2B-black?style=flat&logo=reflex&logoColor=white)
+
 
 Une application web moderne et performante pour l'analyse de données bancaires, construite avec [Reflex](https://reflex.dev). Ce frontend offre une interface intuitive pour visualiser les transactions, gérer les relations clients et détecter les fraudes potentielles grâce à des modèles prédictifs.
 
