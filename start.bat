@@ -5,7 +5,7 @@ echo ==========================================
 
 echo.
 echo [1/2] Checking for backend API...
-powershell -Command "Test-NetConnection -ComputerName localhost -Port 8000 -InformationLevel Quiet" > nul
+python -c "import socket, sys; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); result = s.connect_ex(('localhost', 8000)); s.close(); sys.exit(0 if result == 0 else 1)" > nul 2>&1
 if %errorlevel% neq 0 (
     echo [WARNING] Port 8000 is not accessible!
     echo.
